@@ -1,5 +1,4 @@
-import { z } from 'zod';
-import { baseProcedure, createTRPCRouter } from '../init';
+import {  createTRPCRouter } from '../init';
 import { CategoriesRouter } from '@/app/modules/categories/server/procedure';
 export const appRouter = createTRPCRouter({
   categories: CategoriesRouter

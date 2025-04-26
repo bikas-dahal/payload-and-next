@@ -1,4 +1,3 @@
-
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -26,15 +25,18 @@ export const CategoriesSidebar = ({
   const [parentCategories, setParentCategories] = useState<
     CategoriesGetManyOutput[] | null
   >(null);
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoriesGetManyOutput[1] | null>(null);
-
-
+  const [selectedCategory, setSelectedCategory] = useState<
+    CategoriesGetManyOutput[1] | null
+  >(null);
 
   // check if we have parent categories
 
-  const trpc = useTRPC() 
-  const {  data: categories} = useQuery(trpc.categories.getMany.queryOptions())
+  const trpc = useTRPC();
+  const {
+    data: categories,
+    isLoading,
+    error,
+  } = useQuery(trpc.categories.getMany.queryOptions());
 
   const currentCategories = parentCategories ?? categories ?? [];
   const router = useRouter();
@@ -71,6 +73,18 @@ export const CategoriesSidebar = ({
   };
 
   const backgroundColor = selectedCategory?.color || "#f5f5f5";
+
+  if (isLoading) {
+    return <div className="p-4">Loading categories...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+        Failed to load categories: {error.message}
+      </div>
+    );
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>

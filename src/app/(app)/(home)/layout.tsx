@@ -13,7 +13,7 @@ interface Props {
 export default async function RootLayout({ children }: Props) {
   
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(
+  await queryClient.prefetchQuery(
     trpc.categories.getMany.queryOptions()
   )
 
