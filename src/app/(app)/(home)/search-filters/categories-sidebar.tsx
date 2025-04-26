@@ -1,4 +1,3 @@
-
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -7,28 +6,37 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { CustomCategory } from "../types";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Category } from "@/payload-types";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+import { CategoriesGetManyOutput } from "@/app/modules/categories/types";
 
 interface CategorySidebarProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  categories: CustomCategory[];
 }
 
 export const CategoriesSidebar = ({
-  categories,
   isOpen,
   onOpenChange,
 }: CategorySidebarProps) => {
   const [parentCategories, setParentCategories] = useState<
-    CustomCategory[] | null
+    CategoriesGetManyOutput[] | null
   >(null);
-  const [selectedCategory, setSelectedCategory] =
-    useState<CustomCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    CategoriesGetManyOutput[1] | null
+  >(null);
 
   // check if we have parent categories
+
+  const trpc = useTRPC();
+  const {
+    data: categories,
+    isLoading,
+    error,
+  } = useQuery(trpc.categories.getMany.queryOptions());
 
   const currentCategories = parentCategories ?? categories ?? [];
   const router = useRouter();
@@ -39,9 +47,9 @@ export const CategoriesSidebar = ({
     onOpenChange(open);
   };
 
-  const handleCategoryClick = (category: CustomCategory) => () => {
+  const handleCategoryClick = (category: CategoriesGetManyOutput[1]) => () => {
     if (category.subcategories && category.subcategories.length > 0) {
-      setParentCategories(category.subcategories as CustomCategory[]);
+      setParentCategories(category.subcategories as CategoriesGetManyOutput);
       setSelectedCategory(category);
     } else {
       if (parentCategories && selectedCategory) {
@@ -65,6 +73,18 @@ export const CategoriesSidebar = ({
   };
 
   const backgroundColor = selectedCategory?.color || "#f5f5f5";
+
+  if (isLoading) {
+    return <div className="p-4">Loading categories...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+        Failed to load categories: {error.message}
+      </div>
+    );
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
