@@ -1,15 +1,16 @@
 "use client";
 
 import { CategoryDropdown } from "./category-dropdown";
-import { CustomCategory } from "../types";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ListFilterIcon } from "lucide-react";
 import { CategoriesSidebar } from "./categories-sidebar";
+import { CustomCategory } from "../types";
+import { CategoriesGetManyOutput } from "@/app/modules/categories/types";
 
 interface Props {
-  data: CustomCategory[];
+  data: CategoriesGetManyOutput
 }
 
 export const Categories = ({ data }: Props) => {
@@ -51,7 +52,6 @@ export const Categories = ({ data }: Props) => {
 
         setVisibleCount(visibleCount);
       }
-
     };
     const resizeObserver = new ResizeObserver(calcualteVisibleCount);
     resizeObserver.observe(containerRef.current!);
@@ -63,8 +63,10 @@ export const Categories = ({ data }: Props) => {
 
   return (
     <div className="relative w-full">
-
-        <CategoriesSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} categories={data} />
+      <CategoriesSidebar
+        isOpen={isSidebarOpen}
+        onOpenChange={setIsSidebarOpen}
+      />
 
       <div
         ref={measureRef}
