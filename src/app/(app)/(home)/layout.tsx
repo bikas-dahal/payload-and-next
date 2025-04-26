@@ -10,6 +10,13 @@ interface Props {
   children: React.ReactNode;
 }
 
+/**
+ * Asynchronous React layout component that wraps content with navigation, search filters, and footer.
+ *
+ * Prefetches category data for React Query hydration and renders nested content within a structured page layout.
+ *
+ * @param children - The content to be rendered within the layout.
+ */
 export default async function RootLayout({ children }: Props) {
   
   const queryClient = getQueryClient();

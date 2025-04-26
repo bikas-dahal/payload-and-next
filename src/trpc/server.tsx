@@ -22,6 +22,13 @@ createTRPCOptionsProxy({
   queryClient: getQueryClient,
 });
 
+/**
+ * Wraps children in a React Query hydration boundary using the server-side query client's dehydrated state.
+ *
+ * Ensures that prefetched data from the server is available for client-side React Query caching and hydration.
+ *
+ * @param children - The React elements to render within the hydration boundary.
+ */
 export function HydrateClient(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (
@@ -30,6 +37,13 @@ export function HydrateClient(props: { children: React.ReactNode }) {
     </HydrationBoundary>
   );
 }
+/**
+ * Prefetches data for a tRPC query using the stable query client.
+ *
+ * Determines whether the query is infinite or standard based on the query key and prefetches accordingly to populate the React Query cache.
+ *
+ * @param queryOptions - The tRPC query options to prefetch.
+ */
 export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(
   queryOptions: T,
 ) {

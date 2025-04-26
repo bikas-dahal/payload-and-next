@@ -1,5 +1,8 @@
-
-
+/**
+ * Renders the home page with a static "Categories" header.
+ *
+ * @returns A JSX element containing the page header.
+ */
 export default async function Home() {
 
   
