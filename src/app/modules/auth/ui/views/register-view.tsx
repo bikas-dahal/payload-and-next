@@ -129,7 +129,7 @@ export const RegisterView = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base">Passowrd</FormLabel>
+                  <FormLabel className="text-base">Password</FormLabel>
                   <FormControl>
                     <Input {...field} type="password" />
                   </FormControl>
