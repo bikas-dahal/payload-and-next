@@ -31,10 +31,10 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: NavbarProps) => {
                         </Link>
                     ))}
                     <div className="border-t">
-                        <Link onClick={() => onOpenChange(false)} href={'/sign-in'} className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium">
+                        <Link onClick={() => onOpenChange(false)} href={'/login'} className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium">
                             Login
                         </Link>
-                        <Link onClick={() => onOpenChange(false)} href={'/sign-up'} className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium">
+                        <Link onClick={() => onOpenChange(false)} href={'/register'} className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium">
                             Start Selling
                         </Link>
                     </div>

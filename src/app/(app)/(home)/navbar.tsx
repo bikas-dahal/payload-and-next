@@ -63,10 +63,10 @@ export const Navbar = () => {
 
             <div className="hidden lg:flex items-center">
                 <Button asChild variant={'secondary'} className="border-l border-t-0 border-r-0 px-12 h-full rounded-none bg-white hover:bg-pink-400 transition-colors text-lg">
-                    <Link href={'/sign-in'}>Login</Link>
+                    <Link prefetch href={'/login'}>Login</Link>
                 </Button>
                 <Button asChild variant={'outline'} className="border-l border-t-0 border-r-0 px-12 h-full rounded-none bg-black text-white hover:text-black hover:bg-pink-400 transition-colors text-lg">
-                    <Link href={'/sign-up'}>Sign Up</Link>
+                    <Link prefetch href={'/register'}>Register</Link>
                 </Button>
             </div>
 
