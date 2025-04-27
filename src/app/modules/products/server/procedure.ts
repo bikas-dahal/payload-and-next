@@ -8,10 +8,24 @@ export const ProductRouter = createTRPCRouter({
     .input(
       z.object({
         categorySlug: z.string().optional().nullable(),
+        minPrice: z.number().optional().nullable(),
+        maxPrice: z.number().optional().nullable(),
       })
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
+
+      if (input.minPrice) {
+        where.price = {
+          greater_than_equal: input.minPrice,
+        };
+      }
+
+      if (input.maxPrice) {
+        where.price = {
+          less_than_equal: input.maxPrice,
+        };
+      }
 
       if (input.categorySlug) {
         const categoriesData = await ctx.payload.find({
@@ -42,11 +56,11 @@ export const ProductRouter = createTRPCRouter({
             ...(parentCategory.subcategories?.docs.map((subcategory) => subcategory.slug)
           )
           );
+          where["category.slug"] = {
+            in: [parentCategory.slug, ...subcategoriesSlug],
+          };
         }
 
-        where["category.slug"] = {
-          in: [parentCategory.slug, ...subcategoriesSlug],
-        };
       }
 
       const data = await ctx.payload.find({
