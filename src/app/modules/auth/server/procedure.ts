@@ -1,9 +1,8 @@
-import { headers as getHeaders, cookies as getCookies } from "next/headers";
-import { z } from "zod";
+import { headers as getHeaders } from "next/headers";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { AUTH_COOKIE } from "../constants";
 import { loginSchema, registerSchema } from "../schemas";
+import { generateAuthCookie } from "../utils";
 
 export const AuthRouter = createTRPCRouter({
   session: baseProcedure.query(async ({ ctx }) => {
@@ -73,14 +72,9 @@ export const AuthRouter = createTRPCRouter({
         });
       }
 
-      const cookies = await getCookies();
-      cookies.set({
-        name: AUTH_COOKIE,
+      await generateAuthCookie({
+        prefix: ctx.payload.config.cookiePrefix,
         value: data.token,
-        httpOnly: true,
-        path: "/",
-        // sameSite: 'none',
-        // domain: process.env.NEXT_PUBLIC_DOMAIN,
       });
     }),
   login: baseProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
@@ -91,7 +85,7 @@ export const AuthRouter = createTRPCRouter({
         password: input.password,
       },
     });
- 
+
     if (!data.token) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -99,22 +93,11 @@ export const AuthRouter = createTRPCRouter({
       });
     }
 
-    const cookies = await getCookies();
-    cookies.set({
-      name: AUTH_COOKIE,
+    await generateAuthCookie({
+      prefix: ctx.payload.config.cookiePrefix,
       value: data.token,
-      httpOnly: true,
-      path: "/",
-      // sameSite: 'none',
-      // domain: process.env.NEXT_PUBLIC_DOMAIN,
     });
 
     return data;
-  }),
-  logout: baseProcedure.mutation(async ({ ctx }) => {
-    const cookies = await getCookies();
-    cookies.delete({
-      name: AUTH_COOKIE,
-    });
   }),
 });
