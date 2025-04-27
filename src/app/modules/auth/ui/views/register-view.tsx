@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -30,18 +30,20 @@ const poppins = Poppins({
 });
 
 export const RegisterView = () => {
-    const router = useRouter();
-    const trpc = useTRPC();
+  const router = useRouter();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const register = useMutation(
     trpc.auth.register.mutationOptions({
       onError: (error) => toast.error(error.message),
-      onSuccess: () => {
+      onSuccess: async () => {
         toast.success("Account created successfully");
+        await queryClient.invalidateQueries(trpc.auth.session.queryOptions());
         router.push("/");
       },
     })
   );
-
 
   const form = useForm<RegisterType>({
     mode: "onChange",

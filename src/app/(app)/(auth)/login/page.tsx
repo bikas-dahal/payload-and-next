@@ -1,9 +1,14 @@
-import { LoginView } from "@/app/modules/auth/ui/views/login-view"
+import { LoginView } from "@/app/modules/auth/ui/views/login-view";
+import { caller } from "@/trpc/server";
+import { redirect } from "next/navigation";
 
-const LoginPage = () => {
-  return (
-    <LoginView />
-  )
-}
+const LoginPage = async () => {
+  const session = await caller.auth.session();
+  if (session.user) {
+    redirect("/");
+  }
 
-export default LoginPage
+  return <LoginView />;
+};
+
+export default LoginPage;
