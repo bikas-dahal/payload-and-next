@@ -14,7 +14,7 @@ export const SearchFilters = () => {
 
   const params = useParams();
   const categoryParam = params.category as string | undefined;
-  const activeCategory = categoryParam
+  const activeCategory = categoryParam || 'all';
 
   const activeCategoryData = data.find(
     (category) => category.slug === activeCategory
