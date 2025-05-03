@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ListFilterIcon } from "lucide-react";
 import { CategoriesSidebar } from "./categories-sidebar";
-import { CustomCategory } from "../../../../../(app)/(home)/types";
 import { CategoriesGetManyOutput } from "@/app/modules/categories/types";
 import { useParams } from "next/navigation";
 

@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Category } from "@/payload-types";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
-import { CategoriesGetManyOutput } from "@/app/modules/categories/types";
+import { CustomCategory } from "@/app/(app)/(home)/types";
 
 interface CategorySidebarProps {
   isOpen: boolean;
@@ -22,15 +22,10 @@ export const CategoriesSidebar = ({
   isOpen,
   onOpenChange,
 }: CategorySidebarProps) => {
-  const [parentCategories, setParentCategories] = useState<
-    CategoriesGetManyOutput[] | null
-  >(null);
-  const [selectedCategory, setSelectedCategory] = useState<
-    CategoriesGetManyOutput[1] | null
-  >(null);
+  const [parentCategories, setParentCategories] = useState<CustomCategory[] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CustomCategory | null>(null);
 
-  // check if we have parent categories
-
+  // Fetch categories with TRPC
   const trpc = useTRPC();
   const {
     data: categories,
@@ -46,10 +41,11 @@ export const CategoriesSidebar = ({
     setSelectedCategory(null);
     onOpenChange(open);
   };
-
-  const handleCategoryClick = (category: CategoriesGetManyOutput[1]) => () => {
+    
+  const handleCategoryClick = (category: CustomCategory) => () => {
     if (category.subcategories && category.subcategories.length > 0) {
-      setParentCategories(category.subcategories as CategoriesGetManyOutput);
+      // Here's the fix - we're now setting the actual subcategories array
+      setParentCategories(category.subcategories);
       setSelectedCategory(category);
     } else {
       if (parentCategories && selectedCategory) {
@@ -93,7 +89,6 @@ export const CategoriesSidebar = ({
         className="p-0"
         style={{
           backgroundColor,
-          // backdropFilter: "blur(100px)",
         }}
       >
         <SheetHeader className="p-4 border-b">
@@ -109,7 +104,7 @@ export const CategoriesSidebar = ({
               Back
             </button>
           )}
-          {currentCategories.map((category) => (
+          {Array.isArray(currentCategories) && currentCategories.map((category) => (
             <button
               key={category.slug}
               className="w-full cursor-pointer text-left p-4 hover:bg-black hover:text-white flex items-center justify-between underline font-medium transition-colors duration-200"

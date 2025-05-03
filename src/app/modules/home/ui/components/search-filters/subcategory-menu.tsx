@@ -30,7 +30,7 @@ export const SubcategoryMenu = ({ category, isOpen, position }: Props) => {
                 backgroundColor
             }} className="w-60 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-2 -translate-y-2 text-black rounded-md overflow-hidden border">
                 <div className="flex flex-col gap-2 p-2">
-                    {category.subcategories.map((subcategory: Category) => (
+                    {category.subcategories.map((subcategory) => (
                         <Link href={`/${category.slug}/${subcategory.slug}`} key={subcategory.id}  className="w-full text-left p-4 hover:bg-gray-200 flex items-center justify-between underline font-medium transition-colors duration-200">
                             {subcategory.name}
                         </Link>

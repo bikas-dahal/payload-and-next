@@ -1,3 +1,4 @@
+import { CustomCategory } from "@/app/(app)/(home)/types";
 import { Category } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { Where } from "payload";
@@ -26,10 +27,10 @@ export const ProductRouter = createTRPCRouter({
           },
         });
 
-        const formattedData = categoriesData.docs.map((doc) => ({
+        const formattedData = (categoriesData.docs ?? []).map((doc) => ({
           ...doc,
-          subcategories: (doc.subcategories?.docs ?? []).map((doc) => ({
-            ...(doc as Category),
+          subcategories: (doc.subcategories?.docs ?? []).map((doc: Category) => ({
+            ...(doc),
             subcategory: undefined,
           })),
         }));
@@ -39,7 +40,7 @@ export const ProductRouter = createTRPCRouter({
 
         if (parentCategory) {
           subcategoriesSlug.push(
-            ...(parentCategory.subcategories?.docs.map((subcategory) => subcategory.slug)
+            ...((parentCategory.subcategories?.docs ?? []).map((subcategory: Category) => subcategory.slug)
           )
           );
         }

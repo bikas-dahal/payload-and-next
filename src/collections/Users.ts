@@ -13,6 +13,5 @@ export const Users: CollectionConfig = {
       unique: true,
       type: 'text',
     },
-    
   ],
 }
