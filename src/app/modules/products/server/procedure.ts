@@ -17,11 +17,12 @@ export const ProductRouter = createTRPCRouter({
         maxPrice: z.string().optional().nullable(),
         tags: z.array(z.string()).optional().nullable(),
         sort: z.enum(sortValues).nullable().optional(),
+        tenantSlug: z.string().optional().nullable(),
       })
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
-      let sort: Sort = '-createdAt';
+      let sort: Sort = "-createdAt";
 
       if (input.sort) {
         switch (input.sort) {
@@ -37,7 +38,6 @@ export const ProductRouter = createTRPCRouter({
         }
       }
 
-
       if (input.minPrice && input.maxPrice) {
         where.price = {
           greater_than_equal: input.minPrice,
@@ -50,6 +50,12 @@ export const ProductRouter = createTRPCRouter({
       } else if (input.maxPrice) {
         where.price = {
           less_than_equal: input.maxPrice,
+        };
+      }
+
+      if (input.tenantSlug) {
+        where["tenant.slug"] = {
+          equals: input.tenantSlug,
         };
       }
 
@@ -68,10 +74,12 @@ export const ProductRouter = createTRPCRouter({
 
         const formattedData = (categoriesData.docs ?? []).map((doc) => ({
           ...doc,
-          subcategories: (doc.subcategories?.docs ?? []).map((doc: Category) => ({
-            ...(doc),
-            subcategory: undefined,
-          })),
+          subcategories: (doc.subcategories?.docs ?? []).map(
+            (doc: Category) => ({
+              ...doc,
+              subcategory: undefined,
+            })
+          ),
         }));
 
         const subcategoriesSlug = [];
@@ -79,8 +87,9 @@ export const ProductRouter = createTRPCRouter({
 
         if (parentCategory) {
           subcategoriesSlug.push(
-            ...((parentCategory.subcategories?.docs ?? []).map((subcategory: Category) => subcategory.slug)
-          )
+            ...(parentCategory.subcategories?.docs ?? []).map(
+              (subcategory: Category) => subcategory.slug
+            )
           );
         }
 
@@ -97,22 +106,24 @@ export const ProductRouter = createTRPCRouter({
 
       const data = await ctx.payload.find({
         collection: "products",
-        depth: 1,
+        depth: 2,
         where,
         sort,
         page: input.cursor,
         limit: input.limit,
       });
       // console.log("data", data);
-      
 
       return {
         ...data,
-        docs: data.docs.map((doc) => ({
+        docs: data.docs.map((doc: Product) => ({
           ...doc,
           image: doc.images as Media | null,
           name: doc.name as string,
           price: doc.price as number,
+          tenant: doc.tenant as Tenant & {
+            image: Media | null;
+          },
         })),
       };
     }),

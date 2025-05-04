@@ -1,13 +1,16 @@
+import { generateTenantUrl } from "@/lib/utils";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MouseEvent } from "react";
 
 interface ProductCardProps {
   id: string | number;
   name: string;
   imageUrl?: string | null;
-  authorUsername: string;
-  authorImageUrl?: string | null;
+  tenantSlug: string;
+  tenantImageUrl?: string | null;
   reviewRating: number;
   reviewCount: number;
   price: number;
@@ -17,15 +20,21 @@ export const ProductCard = ({
   id,
   name,
   imageUrl,
-  authorUsername,
-  authorImageUrl,
+  tenantSlug,
+  tenantImageUrl,
   reviewRating,
   reviewCount,
   price,
 }: ProductCardProps) => {
+  const router = useRouter();
+  const handleUserClick = (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    router.push(generateTenantUrl(tenantSlug));
+  };
   return (
     <Link href={`/product/${id}`} className="w-full h-full">
-      <div className="hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow border h-full rounded-md bg-white overflow-hidden flex flex-col shadow-sm transition-shadow duration-200">
+      <div className="hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border h-full rounded-md bg-white overflow-hidden flex flex-col shadow-sm transition-shadow duration-200">
         <div className="relative aspect-square">
           <Image
             src={imageUrl ?? ""}
@@ -40,17 +49,17 @@ export const ProductCard = ({
           </h2>
 
           <div className="flex items-center gap-2" onClick={() => {}}>
-            {authorImageUrl && (
+            {tenantImageUrl && (
               <Image
-                src={authorImageUrl}
-                alt={authorUsername}
+                src={tenantImageUrl}
+                alt={tenantSlug}
                 width={16}
                 height={16}
                 className="shrink-0 size-[16px] border rounded-full"
               />
             )}
             <span className="text-sm font-medium underline text-gray-600">
-              {authorUsername}
+              {tenantSlug}
             </span>
           </div>
           {reviewCount > 0 && (
@@ -105,7 +114,6 @@ export const ProductCard = ({
     // </div>
   );
 };
-
 
 export const ProductCardSkeleton = () => {
   return (

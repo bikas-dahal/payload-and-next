@@ -139,6 +139,30 @@ const categories = [
 
 const seedCategories = async () => {
   const payload = await getPayload({ config });
+
+  const adminTenant = await payload.create({
+    collection: "tenants",
+    data: {
+      name: "admin",
+      slug: "admin",
+      stripeAccountId: "admin",
+    },
+  });
+
+  await payload.create({
+    collection: "users",
+    data: {
+      email: "admin@demo.com",
+      password: "admin",
+      roles: ["super-admin"],
+      username: "admin",
+      tenants: [
+        {
+          tenant: adminTenant.id,
+        },
+      ],
+    },
+  });
   //   const existingCategories = await payload.find({
   //     collection: "categories",
   //     depth: 1,
@@ -185,5 +209,5 @@ try {
   process.exit(0);
 } catch (error) {
   console.error("Error seeding categories:", error);
-    process.exit(1);
+  process.exit(1);
 }

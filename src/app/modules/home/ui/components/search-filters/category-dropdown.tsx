@@ -21,7 +21,6 @@ export const CategoryDropdown = ({
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { getDropdownPosition } = useDropdownPosition(dropdownRef);
 
   const handleMouseEnter = () => {
     if (category.subcategories) {
@@ -32,8 +31,6 @@ export const CategoryDropdown = ({
   const handleMouseLeave = () => {
     setIsHovered(false);
   };
-
-  const dropdownPosition = getDropdownPosition();
 
   const toggleDropdown = () => {
     if (category.subcategories?.length) {
@@ -79,7 +76,6 @@ export const CategoryDropdown = ({
       <SubcategoryMenu
         category={category}
         isOpen={isHovered}
-        position={dropdownPosition}
       />
     </div>
   );

@@ -3,19 +3,21 @@
 import { useTRPC } from "@/trpc/client";
 import {
   useSuspenseInfiniteQuery,
-  useSuspenseQuery,
 } from "@tanstack/react-query";
 import { useProductFilter } from "../../hooks/use-product-filters";
 import { ProductCard, ProductCardSkeleton } from "./product-card";
 import { DEFAULT_LIMIT } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { InboxIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface ProductListProps {
+interface ProductListProps { 
   categorySlug?: string;
+  tenantSlug?: string;
+  narrowView?: boolean;
 }
 
-export const ProductList = ({ categorySlug }: ProductListProps) => {
+export const ProductList = ({ categorySlug, tenantSlug, narrowView }: ProductListProps) => {
   const [filters] = useProductFilter();
 
   const trpc = useTRPC();
@@ -25,6 +27,7 @@ export const ProductList = ({ categorySlug }: ProductListProps) => {
         {
           ...filters,
           categorySlug,
+          tenantSlug,
           limit: DEFAULT_LIMIT,
         },
         {
@@ -47,7 +50,9 @@ export const ProductList = ({ categorySlug }: ProductListProps) => {
 
   return (
   <>
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div className={cn("grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4",
+        narrowView && "lg:grid-cols-2 xl:grid-cols-3",
+    )}>
       {data?.pages
         .flatMap((page) => page.docs)
         .map((product) => (
@@ -56,8 +61,8 @@ export const ProductList = ({ categorySlug }: ProductListProps) => {
             id={product.id}
             name={product.name}
             imageUrl={product.image?.url ?? ""}
-            authorUsername={"hari"}
-            authorImageUrl={undefined}
+            tenantSlug={product.tenant?.slug ?? ""}
+            tenantImageUrl={product.tenant?.image?.url ?? ""}
             reviewRating={4}
             reviewCount={10}
             price={product.price}
