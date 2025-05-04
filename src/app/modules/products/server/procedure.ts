@@ -1,18 +1,57 @@
 import { CustomCategory } from "@/app/(app)/(home)/types";
-import { Category } from "@/payload-types";
+import { Category, Media } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
-import { Where } from "payload";
+import { Sort, Where } from "payload";
 import { z } from "zod";
+import { sortValues } from "../search-params";
+import { DEFAULT_LIMIT } from "@/constants";
 
 export const ProductRouter = createTRPCRouter({
   getMany: baseProcedure
     .input(
       z.object({
+        cursor: z.number().default(1),
+        limit: z.number().default(DEFAULT_LIMIT),
         categorySlug: z.string().optional().nullable(),
+        minPrice: z.string().optional().nullable(),
+        maxPrice: z.string().optional().nullable(),
+        tags: z.array(z.string()).optional().nullable(),
+        sort: z.enum(sortValues).nullable().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
+      let sort: Sort = '-createdAt';
+
+      if (input.sort) {
+        switch (input.sort) {
+          case "newest":
+            sort = "-createdAt";
+            break;
+          case "oldest":
+            sort = "createdAt";
+            break;
+          case "Trending":
+            sort = "-price";
+            break;
+        }
+      }
+
+
+      if (input.minPrice && input.maxPrice) {
+        where.price = {
+          greater_than_equal: input.minPrice,
+          less_than_equal: input.maxPrice,
+        };
+      } else if (input.minPrice) {
+        where.price = {
+          greater_than_equal: input.minPrice,
+        };
+      } else if (input.maxPrice) {
+        where.price = {
+          less_than_equal: input.maxPrice,
+        };
+      }
 
       if (input.categorySlug) {
         const categoriesData = await ctx.payload.find({
@@ -50,13 +89,31 @@ export const ProductRouter = createTRPCRouter({
         };
       }
 
+      if (input.tags && input.tags.length > 0) {
+        where.tags = {
+          in: input.tags,
+        };
+      }
+
       const data = await ctx.payload.find({
         collection: "products",
         depth: 1,
         where,
-        sort: "name",
+        sort,
+        page: input.cursor,
+        limit: input.limit,
       });
+      // console.log("data", data);
+      
 
-      return data;
+      return {
+        ...data,
+        docs: data.docs.map((doc) => ({
+          ...doc,
+          image: doc.images as Media | null,
+          name: doc.name as string,
+          price: doc.price as number,
+        })),
+      };
     }),
 });
