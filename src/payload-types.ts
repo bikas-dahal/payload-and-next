@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     categories: Category;
     products: Product;
+    tags: Tag;
+    tenants: Tenant;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -85,6 +87,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
+    tenants: TenantsSelect<false> | TenantsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -128,6 +132,16 @@ export interface UserAuthOperations {
 export interface User {
   id: string;
   username: string;
+  /**
+   * This is the role of the user.
+   */
+  roles?: ('user' | 'admin' | 'super-admin')[] | null;
+  tenants?:
+    | {
+        tenant: string | Tenant;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -138,6 +152,32 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenants".
+ */
+export interface Tenant {
+  id: string;
+  /**
+   * This is the name of your store.
+   */
+  name: string;
+  /**
+   * This is the slug of your store. It will be used in the URL.
+   */
+  slug: string;
+  image?: (string | null) | Media;
+  /**
+   * This is the stripe account id of your store. It will be used to connect your store to stripe.
+   */
+  stripeAccountId: string;
+  /**
+   * you need to submit your stripe details to connect your store to stripe.
+   */
+  stripeDetailSubmitted?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -182,6 +222,7 @@ export interface Category {
  */
 export interface Product {
   id: string;
+  tenant?: (string | null) | Tenant;
   name: string;
   description?: string | null;
   /**
@@ -189,8 +230,20 @@ export interface Product {
    */
   price: number;
   category?: (string | null) | Category;
+  tags?: (string | Tag)[] | null;
   images?: (string | null) | Media;
   'refund-policy'?: ('30-days' | '60-days' | '90-days' | 'No-Refund' | '7-days') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: string;
+  name: string;
+  products?: (string | Product)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -216,6 +269,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'tags';
+        value: string | Tag;
+      } | null)
+    | ({
+        relationTo: 'tenants';
+        value: string | Tenant;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -265,6 +326,13 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   username?: T;
+  roles?: T;
+  tenants?:
+    | T
+    | {
+        tenant?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -311,12 +379,37 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
+  tenant?: T;
   name?: T;
   description?: T;
   price?: T;
   category?: T;
+  tags?: T;
   images?: T;
   'refund-policy'?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  name?: T;
+  products?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenants_select".
+ */
+export interface TenantsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  image?: T;
+  stripeAccountId?: T;
+  stripeDetailSubmitted?: T;
   updatedAt?: T;
   createdAt?: T;
 }

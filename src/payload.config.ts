@@ -14,6 +14,7 @@ import { Tags } from './collections/Tags'
 import { Tenants } from './collections/Tenants'
 import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 
+import { Config, User } from './payload-types'
 
 
 const filename = fileURLToPath(import.meta.url)
@@ -39,14 +40,14 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
-    multiTenantPlugin({
+    multiTenantPlugin<Config>({
       collections: {
         products: {}
       },
       tenantsArrayField: {
         includeDefaultField: false,
       },
-      userHasAccessToAllTenants: (user) => Boolean(user?.roles?.includes('super-admin')),
+      userHasAccessToAllTenants: (user: User) => Boolean(user?.roles?.includes('super-admin')),
     })
     // storage-adapter-placeholder
   ],

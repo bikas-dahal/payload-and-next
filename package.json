@@ -2,6 +2,7 @@
   "name": "payload",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -10,7 +11,9 @@
     "generate:types": "tsx ./node_modules/payload/bin.js generate:types --config src/payload.config.ts",
     "db:fresh": "tsx ./node_modules/payload/bin.js migrate:fresh --config src/payload.config.ts",
     "db:seed": "bun run src/seed.ts",
-    "generate:importmap": "tsx ./node_modules/payload/bin.js generate:importmap --config src/payload.config.ts"
+    "generate:importmap": "tsx ./node_modules/payload/bin.js generate:importmap --config src/payload.config.ts",
+    "gen": "payload generate:types"
+
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
