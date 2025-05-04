@@ -1,26 +1,30 @@
-import { getPayload } from "payload";
-import configPromise from "@payload-config";
+import { getQueryClient, trpc } from "@/trpc/server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { SearchParams } from "nuqs/server";
+import { loadProductFilter } from "@/app/modules/products/search-params";
+import { ProductListView } from "@/app/modules/products/ui/views/product-list-view";
+import { DEFAULT_LIMIT } from "@/constants";
 
+interface CategoryPageProps {
+  searchParams: Promise<SearchParams>;
+}
 
-export default async function Home() {
+const CategoryPage = async ({ searchParams }: CategoryPageProps) => {
+  const filters = await loadProductFilter(searchParams);
 
-    const payload = await getPayload({
-      config: configPromise
+  const queryClient = getQueryClient();
+  void queryClient.prefetchInfiniteQuery(
+    trpc.products.getMany.infiniteQueryOptions({
+      ...filters,
+      limit: DEFAULT_LIMIT,
     })
-
-    const data = await payload.find({
-      collection: "categories",
-
-    })
-
-    console.log("Categories", typeof data);
-    
+  );
 
   return (
-    <div>
-      {/* {JSON.stringify(data, null, 2)} */}
-      <h1>Categories</h1>
-      
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProductListView />
+    </HydrationBoundary>
   );
-}
+};
+
+export default CategoryPage;
